@@ -33,3 +33,33 @@ docker push 4utep/otus-reddit:1.0
 docker run --name reddit -d -p 9292:9292 4utep/otus-reddit:1.0
 
 
+
+docker network create reddit
+docker run -d --network=reddit --network-alias=post_db --network-alias=comment_db mongo:latest
+docker run -d --network=reddit --network-alias=post 4utep/post:1.0
+docker run -d --network=reddit --network-alias=comment 4utep/comment:1.0
+docker run -d --network=reddit -p 9292:9292 4utep/ui:1.0
+
+docker build -t 4utep/ui:2.0 ./ui
+
+docker kill $(docker ps -q)
+docker run -d --network=reddit --network-alias=post_db --network-alias=comment_db mongo:latest
+docker run -d --network=reddit --network-alias=post 4utep/post:1.0
+docker run -d --network=reddit --network-alias=comment 4utep/comment:1.0
+docker run -d --network=reddit -p 9292:9292 4utep/ui:2.0
+
+
+docker volume create reddit_db
+
+
+docker kill $(docker ps -q)
+docker run -d --network=reddit --network-alias=post_db --network-alias=comment_db -v reddit_db:/data/db mongo:latest
+docker run -d --network=reddit --network-alias=post 4utep/post:1.0
+docker run -d --network=reddit --network-alias=comment 4utep/comment:1.0
+docker run -d --network=reddit -p 9292:9292 4utep/ui:2.0
+
+
+
+
+
+
