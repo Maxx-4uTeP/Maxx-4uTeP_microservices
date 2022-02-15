@@ -4,3 +4,9 @@ prometheus/
 
 ## python specific
 *.pyc
+
+## environment
+*.env
+
+
+
