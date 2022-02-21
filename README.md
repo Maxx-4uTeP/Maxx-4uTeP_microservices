@@ -138,6 +138,100 @@ export USERNAME=4utep
 docker-compose up -d
 docker-compose ps
 
+## GITLAB CI
+
+# new vm
+yc compute instance create \
+  --name gitlab-ci-vm \
+  --platform standard-v2 \
+  --memory 4GB \
+  --cores 2 \
+  --core-fraction 100 \
+  --preemptible \
+  --zone ru-central1-a \
+  --network-interface subnet-name=default-ru-central1-a,nat-ip-version=ipv4 \
+  --create-boot-disk image-folder-id=standard-images,image-family=ubuntu-1804-lts,size=30 \
+  --ssh-key ~/.ssh/id_rsa.pub
+# 11
+docker-machine create \
+  --driver generic \
+  --generic-ip-address=84.252.128.20 \
+  --generic-ssh-user yc-user \
+  --generic-ssh-key ~/.ssh/id_rsa \
+  docker-gitlab 
+
+# 12
+ssh yc-user@84.252.128.20
+
+sudo mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs
+cd /srv/gitlab
+sudo touch docker-compose.yml
+
+# 13
+web:
+  image: 'gitlab/gitlab-ce:latest'
+  restart: always
+  hostname: 'gitlab.example.com'
+  environment:
+    GITLAB_OMNIBUS_CONFIG: |
+      external_url 'http://84.252.128.20'
+  ports:
+    - '80:80'
+    - '443:443'
+    - '2222:22'
+  volumes:
+    - '/srv/gitlab/config:/etc/gitlab'
+    - '/srv/gitlab/logs:/var/log/gitlab'
+    - '/srv/gitlab/data:/var/opt/gitlab'
+
+
+# 14
+docker-compose up -d
+
+# 17
+login: root
+Password:
+sudo docker exec -it 08ce31c460c0 grep 'Password:' /etc/gitlab/initial_root_password
+
+
+# 25
+git add .gitlab-ci.yml
+git commit -m 'add pipeline definition'
+git push gitlab gitlab-ci-1
+
+# 28
+ssh yc-user@84.252.128.20
+sudo -i
+cd /srv/gitlab
+docker run -d \
+  --name gitlab-runner \
+  --restart always \
+  -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  gitlab/gitlab-runner:latest
+
+# 29
+docker exec -it gitlab-runner gitlab-runner register \
+    --url http://84.252.128.20/ \
+    --non-interactive \
+    --locked=false \
+    --name DockerRunner \
+    --executor docker \
+    --docker-image alpine:latest \
+    --registration-token ehNXgYEzxNFya8cTma5u \
+    --tag-list "linux,xenial,ubuntu,docker" \
+    --run-untagged
+
+# 32
+git clone https://github.com/express42/reddit.git && rm -rf ./reddit/.git
+git add reddit/
+git commit -m "Add reddit app"
+git push gitlab gitlab-ci-1
+
+
+
+
+
 
 
 
