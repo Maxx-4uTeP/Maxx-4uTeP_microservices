@@ -155,18 +155,19 @@ yc compute instance create \
 # 11
 docker-machine create \
   --driver generic \
-  --generic-ip-address=84.252.128.20 \
+  --generic-ip-address=62.84.124.102 \
   --generic-ssh-user yc-user \
   --generic-ssh-key ~/.ssh/id_rsa \
   docker-gitlab 
 
 # 12
-ssh yc-user@84.252.128.20
+ssh yc-user@62.84.124.102
 
-sudo mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs
+sudo -i
+mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs
 cd /srv/gitlab
-sudo touch docker-compose.yml
-
+touch docker-compose.yml
+nano docker-compose.yml
 # 13
 web:
   image: 'gitlab/gitlab-ce:latest'
@@ -174,7 +175,7 @@ web:
   hostname: 'gitlab.example.com'
   environment:
     GITLAB_OMNIBUS_CONFIG: |
-      external_url 'http://84.252.128.20'
+      external_url 'http://62.84.124.102'
   ports:
     - '80:80'
     - '443:443'
@@ -186,21 +187,31 @@ web:
 
 
 # 14
+
+apt install docker-compose
 docker-compose up -d
 
 # 17
+http://62.84.124.102
 login: root
 Password:
-sudo docker exec -it 08ce31c460c0 grep 'Password:' /etc/gitlab/initial_root_password
+sudo docker exec -it 4c385a834f51 grep 'Password:' /etc/gitlab/initial_root_password
 
 
 # 25
+exit
+exit
+
+git checkout -b gitlab-ci-1
+git remote add gitlab http://62.84.124.102/homework/example.git
+git push gitlab gitlab-ci-1
+
 git add .gitlab-ci.yml
 git commit -m 'add pipeline definition'
 git push gitlab gitlab-ci-1
 
 # 28
-ssh yc-user@84.252.128.20
+ssh yc-user@62.84.124.102
 sudo -i
 cd /srv/gitlab
 docker run -d \
@@ -212,13 +223,13 @@ docker run -d \
 
 # 29
 docker exec -it gitlab-runner gitlab-runner register \
-    --url http://84.252.128.20/ \
+    --url http://62.84.124.102/ \
     --non-interactive \
     --locked=false \
     --name DockerRunner \
     --executor docker \
     --docker-image alpine:latest \
-    --registration-token ehNXgYEzxNFya8cTma5u \
+    --registration-token sG19yeJsdgzYsGxxjQA3 \
     --tag-list "linux,xenial,ubuntu,docker" \
     --run-untagged
 
