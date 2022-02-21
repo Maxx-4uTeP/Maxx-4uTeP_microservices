@@ -144,7 +144,7 @@ docker-compose ps
 yc compute instance create \
   --name gitlab-ci-vm \
   --platform standard-v2 \
-  --memory 4GB \
+  --memory 8GB \
   --cores 2 \
   --core-fraction 100 \
   --preemptible \
@@ -228,8 +228,9 @@ git add reddit/
 git commit -m "Add reddit app"
 git push gitlab gitlab-ci-1
 
-
-
+# 36
+git commit -am "page 36"
+git push gitlab gitlab-ci-1
 
 
 
