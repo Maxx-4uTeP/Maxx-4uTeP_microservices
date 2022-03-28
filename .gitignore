@@ -2,6 +2,7 @@
 key.json
 vault.key
 build_info.txt
+src copy/
 
 
 ## python specific
