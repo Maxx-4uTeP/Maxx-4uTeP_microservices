@@ -4,6 +4,8 @@ services:
     image: mongo:3.2
     volumes:
       - post_db:/data/db
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     networks:
       - back_net
   ui:
@@ -11,17 +13,33 @@ services:
     image: ${USER}/ui:$VER_UI
     ports:
       - ${EXT_PORT}:${INT_PORT}/tcp
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.ui
     networks:
       - front_net
   post:
     build: ../src/post-py
     image: ${USER}/post:${VER_POST}
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.post
     networks:
       - front_net
       - back_net
   comment:
     build: ../src/comment
     image: ${USER}/comment:${VER_COMMENT}
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     networks:
       - front_net
       - back_net
@@ -35,6 +53,8 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention=1d' # Задаем время хранения метрик в 1 день
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     networks:
       - front_net
       - back_net
@@ -45,6 +65,8 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     command:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
