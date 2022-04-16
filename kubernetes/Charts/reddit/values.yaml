@@ -1,0 +1,25 @@
+---
+comment:
+  image:
+    repository: 4utep/comment
+    tag: latest
+  service:
+    externalPort: 9292
+
+post:
+  image:
+    repository: 4utep/post
+    tag: latest
+  service:
+    externalPort: 5000
+    internalPort: 5000
+
+ui:
+  image:
+    repository: 4utep/ui
+    tag: latest
+  service:
+    externalPort: 9292
+
+
+
