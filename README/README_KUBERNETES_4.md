@@ -41,4 +41,33 @@ helm install reddit kubernetes/Charts/reddit/
 helm uninstall reddit && helm dep update kubernetes/Charts/reddit/ && helm install reddit kubernetes/Charts/reddit/
 k get ingress
 
+# 55
+k create namespace reddit-ns
+helm install reddit kubernetes/Charts/reddit/ --wait --namespace=reddit-ns
+k get ingress -nreddit-ns
+
+# 61
+helm repo add gitlab https://charts.gitlab.io
+helm fetch gitlab/gitlab-omnibus  --version 0.1.37 --untar
+
+# 64 это нихера не работает
+helm dep update gitlab-omnibus
+helm install gitlab gitlab-omnibus
+
+# from internet https://docs.gitlab.com/charts/quickstart/index.html
+helm install gitlab gitlab/gitlab \
+  --set global.hosts.domain=maxx.su \
+  --set certmanager-issuer.email=maxx@maxx.su
+
+kubectl get ingress -lrelease=gitlab
+echo "51.250.73.242 gitlab.maxx.su minio.maxx.su registry.maxx.su” >> /etc/hosts
+
+
+kubectl get secret gitlab-gitlab-initial-root-password -ojsonpath='{.data.password}' | base64 --decode ; echo
+root
+EuzVaN8FtiknNcZILYt9QQKBmTJSwq9HE84wkaTfq5nG4pSqpD6SaKI5hha6zxe0
+
+
+
+
 
