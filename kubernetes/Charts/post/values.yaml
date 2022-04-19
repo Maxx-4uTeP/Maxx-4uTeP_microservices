@@ -1,0 +1,13 @@
+---
+service:
+  internalPort: 5000
+  externalPort: 5000
+
+image:
+  repository: 4utep/post
+  tag: latest
+
+
+databaseHost: 
+
+
